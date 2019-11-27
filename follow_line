@@ -1,0 +1,78 @@
+from gpiozero import DistanceSensor
+from gpiozero import LineSensor
+from gpiozero import Motor
+from time import sleep
+# use 8 pins for motors
+# FR - gpio 21 - forward
+# FL - gpio 20 - forward
+# BR - gpio 16 - forward
+# BL - gpio 12 - forward
+
+# FR - gpio 26 - back
+# FL - gpio 19 - back
+# BR - gpio 13 - back
+# BL - gpio 6 - back
+
+# PINS fo IR  sensors
+# right - gpio 22 - sensor
+# middle - gpio 27 - sensor
+# left - gpio 17 - sensor
+
+# Pins for DS
+# echo - gpio 23
+# trigger = gpio 24
+
+ir_right = LineSensor(22)
+ir_middle = LineSensor(27) # Middle sensor doesn't need tp be used because we cant contlor him by turning. Can be used in spotting line.
+ir_left = LineSensor(17)
+
+DS_sensor = DistanceSensor(echo=23, trigger=24, max_distance=1.5)
+#FORWARD and BACKWARD
+fr_motor = Motor(forward=21, backward=26)
+fl_motor = Motor(forward=20, backward=19)
+br_motor = Motor(forward=16, backward=13)
+bl_motor = Motor(forward=12, backward=6)
+
+def stop_left():
+    print('LEFT Motors stopped.')
+    fl_motor.stop()
+    bl_motor.stop()
+
+#def slow_left():
+#    print('LEFT Motors slowed down')
+ #   fl_motor.forward(speed=0.5)
+  #  bl_motor.forward(speed=0.5)
+
+ir_left.when_line = lambda : stop_left()
+# ir_left.when_line = lambda : slow_left()
+
+def stop_right():
+    print('RIGHT Motors stopped.')
+    fr_motor.stop()
+    br_motor.stop()
+
+# def slow_right():
+#   print('RIGHT Motors slowed down')
+#   fr_motor.forward(speed=0.5)
+#   br_motor.forward(speed=0.5)
+
+ir_right.when_line = lambda : stop_right()
+#ir_right.when_line = lambda : slow_right()
+
+def full_stop():
+    print('FULL STOP')
+    fr_motor.stop()
+    fl_motor.stop()
+    br_motor.stop()
+    bl_motor.stop()
+
+while True:
+    fr_motor.forward()
+    fl_motor.forward()
+    br_motor.forward()
+    bl_motor.forward()
+
+    end = input('Press x for FULL STOP of the car.')
+
+    if end == 'x':
+        full_stop()
